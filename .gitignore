@@ -1,0 +1,26 @@
+# Common exclusions
+node_modules/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+
+# Project specific
+db_data/
+.gemini/
+.notebook/
+api_response.json
+api_response.txt
+contributions_data.txt
+db_dump.txt
+db_dump_v2.txt
+tables_list.txt
+users_data.txt
+users_schema.txt
+
+# Environment secrets
+.env
+config/settings.php
+backend/config/config.php

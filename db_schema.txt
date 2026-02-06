@@ -1,0 +1,46 @@
+
+--- contributions ---
+id
+user_id
+tontine_id
+amount
+contribution_date
+description
+status
+created_at
+
+--- transactions ---
+id
+user_id
+tontine_id
+type
+amount
+transaction_date
+description
+
+--- loans ---
+id
+member_id
+principal
+interest_rate
+duration
+start_date
+description
+status
+created_at
+
+--- guarantees ---
+id
+loan_id
+type
+value
+description
+created_at
+
+--- payments ---
+id
+tontine_id
+beneficiary_id
+amount
+payment_date
+created_at
