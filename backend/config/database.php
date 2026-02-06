@@ -1,10 +1,10 @@
 <?php
 // backend/config/database.php
 
-$host = 'localhost'; // Use 'db' if running inside Docker with docker-compose
+$host = 'db'; // Use 'db' if running inside Docker with docker-compose
 $db = 'tontifaso';
 $user = 'root';
-$pass = '';
+$pass = 'password';
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
