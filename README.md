@@ -97,12 +97,79 @@ Le backend communique exclusivement via **JSON**. Les ports par défaut sont con
 
 ## 📱 Connexion de l'Application Mobile
 
-L'application mobile **ne doit pas** avoir sa propre base de données locale. Elle doit agir comme une extension de l'écosystème TontiFaso.
+L'application mobile doit agir comme une extension de l'écosystème TontiFaso. Voici comment s'interfacer avec le backend.
 
-### Étapes de Connexion :
+### 🔗 Configuration de base
 1. **Base URL** : Utilisez l'adresse IP de la machine hôte. Exemple : `http://192.168.1.XX:8080/`.
-2. **Format de données** : Toutes les requêtes `POST` doivent être envoyées en `multipart/form-data` ou `application/x-www-form-urlencoded` selon les endpoints.
-3. **Persistance** : Le mobile doit utiliser les cookies de session ou les headers API pour maintenir la connexion établie via `login.php`.
+2. **Authentification** : Le backend utilise `PHPSESSID` pour la session. Le mobile doit capturer le cookie `Set-Cookie` lors du login et le renvoyer dans chaque requête.
+
+### 🛠 Exemples d'API (JSON)
+
+#### 1. Authentification (`POST /backend/auth/login.php`)
+**Requête (Multipart/Form-Data) :**
+- `email`: `user@test.com`
+- `password`: `password123`
+
+**Réponse (Success) :**
+```json
+{
+    "success": true,
+    "message": "Login successful",
+    "user": { "id": 5, "fullname": "Verify User", "role": "user" }
+}
+```
+
+#### 2. Synchronisation Globale (`GET /backend/api/get_data.php`)
+Cet endpoint renvoie **tout** l'état de la base pour une mise à jour locale immédiate.
+```json
+{
+    "success": true,
+    "data": {
+        "members": [ { "id": 3, "firstName": "Steve", "lastName": "TO", ... } ],
+        "deposits": [ { "id": 1, "memberId": 3, "amount": "2000.00", ... } ],
+        "loans": [ { "id": 1, "memberId": 5, "principal": "100000.00", ... } ]
+    }
+}
+```
+
+### 💻 Exemple de Code (Dart/Flutter)
+
+Voici comment implémenter un appel API simple avec le package `http` :
+
+```dart
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class TontiService {
+  final String baseUrl = "http://192.168.1.XX:8080";
+  String? _sessionCookie;
+
+  Future<bool> login(String email, String password) async {
+    var response = await http.post(
+      Uri.parse("$baseUrl/backend/auth/login.php"),
+      body: {'email': email, 'password': password},
+    );
+
+    if (response.statusCode == 200) {
+      var result = jsonDecode(response.body);
+      if (result['success']) {
+        // Stocker le cookie pour les prochaines requêtes
+        _sessionCookie = response.headers['set-cookie'];
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<Map?> fetchData() async {
+    var response = await http.get(
+      Uri.parse("$baseUrl/backend/api/get_data.php"),
+      headers: {'cookie': _sessionCookie ?? ''},
+    );
+    return response.statusCode == 200 ? jsonDecode(response.body) : null;
+  }
+}
+```
 
 ---
 
